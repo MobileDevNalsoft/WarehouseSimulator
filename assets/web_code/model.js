@@ -3,6 +3,8 @@ import * as THREE from "three";
 
 // Import loaders and controls from the same version on jsDelivr
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/controls/OrbitControls.js";
+import { GLTFExporter } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/exporters/GLTFExporter.js";
+
 // Step 2: Setting up the 3D Scene with Grid and Axes
 const scene = new THREE.Scene();
 
@@ -36,6 +38,11 @@ scene.add(axesHelper);
 const ambientLight = new THREE.AmbientLight(0x404040); // Soft light
 scene.add(ambientLight);
 
+// Step 3: Replacing AmbientLight with PointLight
+const pointLight = new THREE.PointLight(0xffffff, 1, 100); // White light, intensity 1, and range 100
+pointLight.position.set(10, 10, 10); // Set its position in the scene
+scene.add(pointLight);
+
 // Stronger directional light to highlight objects
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(10, 20, 10);
@@ -48,6 +55,30 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
+// Export function for GLB
+function exportGLB() {
+  console.log("Scene children before export:", scene.children); // Debugging step
+  const exporter = new GLTFExporter();
+  scene.remove(gridHelper);
+  scene.remove(axesHelper);
+  exporter.parse(
+    scene,
+    function (result) {
+      const blob = new Blob([JSON.stringify(result)], { type: 'model/gltf-binary' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'scene.glb';
+      link.click();
+    },
+    { binary: true, includeCustomExtensions: true } // Export as .glb (Binary GLTF)
+  );
+  scene.add(gridHelper);
+  scene.add(axesHelper);
+}
+
+// Button to trigger export
+document.getElementById('exportButton').addEventListener('click', exportGLB);
 
 // Step 5: Drag-and-Drop Functionality
 const draggableElements = document.querySelectorAll(".draggable");
@@ -106,8 +137,8 @@ function addObjectToScene(type, position) {
       );
       break;
     case "plane":
-      object = new THREE.Mesh(new THREE.PlaneGeometry(10,10), new THREE.MeshStandardMaterial({color: 0xff0000}));
-      object.rotation.x = -Math.PI/2;
+      object = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshStandardMaterial({ color: 0xff0000 }));
+      object.rotation.x = -Math.PI / 2;
       break;
     default:
       return;

@@ -78,7 +78,7 @@ class _ThreeJsWebViewState extends State<ThreeJsWebView> with TickerProviderStat
                 return SizedBox(
                   width: size.width*widthAnimation.value,
                   child: InAppWebView(
-                    initialFile: 'assets/web_code/config.html',
+                    initialFile: 'assets/web_code/model.html',
                     onConsoleMessage: (controller, consoleMessage) {
                       try {
                         if (consoleMessage.messageLevel.toNativeValue() == 1) {
@@ -92,7 +92,7 @@ class _ThreeJsWebViewState extends State<ThreeJsWebView> with TickerProviderStat
                     },
                     onWebViewCreated: (controller) async {
                           _warehouseInteractionBloc.state.inAppWebViewController=controller;
-                          // _warehouseInteractionBloc.add(ModelLoaded(isLoaded: true));// remove for loading indicator
+                          _warehouseInteractionBloc.add(ModelLoaded(isLoaded: true));// remove for loading indicator
                          
                           Timer.periodic(const Duration(milliseconds: 500), (timer) async{
                             _warehouseInteractionBloc.state.inAppWebViewController!.webStorage.localStorage.getItems().then((value){
