@@ -80,15 +80,15 @@ class _ThreeJsWebViewState extends State<ThreeJsWebView> with TickerProviderStat
                   child: InAppWebView(
                     initialFile: 'assets/web_code/index.html',
                     onConsoleMessage: (controller, consoleMessage) {
-                      try {
-                        if (consoleMessage.messageLevel.toNativeValue() == 1) {
-                          print('console message ${consoleMessage.message}');
-                          Map<String, dynamic> message = jsonDecode(consoleMessage.message);
-                          _warehouseInteractionBloc.add(SelectedObject(dataFromJS: message));
-                        }
-                      } catch (e) {
-                        print("error $e");
-                      }
+                      // try {
+                      //   if (consoleMessage.messageLevel.toNativeValue() == 1) {
+                      //     print('console message ${consoleMessage.message}');
+                      //     Map<String, dynamic> message = jsonDecode(consoleMessage.message);
+                      //     _warehouseInteractionBloc.add(SelectedObject(dataFromJS: message));
+                      //   }
+                      // } catch (e) {
+                      //   print("error $e");
+                      // }
                     },
                     onWebViewCreated: (controller) async {
                           _warehouseInteractionBloc.state.inAppWebViewController=controller;

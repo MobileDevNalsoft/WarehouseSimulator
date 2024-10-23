@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/controls/OrbitControls.js";
 import { GLTFExporter } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/exporters/GLTFExporter.js";
 import { TransformControls } from "https://cdn.jsdelivr.net/npm/three@0.154.0/examples/jsm/controls/TransformControls.js";
-import { BufferGeometryUtils } from "https://cdn.jsdelivr.net/npm/three@0.154.0/examples/jsm/utils/BufferGeometryUtils.js";
+import { BufferGeometryUtils } from "https://cdn.jsdelivr.net/npm/three@0.125.2/examples/jsm/utils/BufferGeometryUtils.js";
 
 let undoStack = [];
 let redoStack = [];
@@ -19,20 +19,25 @@ document.addEventListener("DOMContentLoaded", function () {
   heading.textContent = "Warehouse Components";
   leftPanel.appendChild(heading);
 
-  // draggables in left panel
-  const ground = document.createElement("div");
-  ground.className = "draggable";
-  ground.id = "ground";
-  ground.setAttribute("draggable", true);
-  ground.textContent = "ground";
-  leftPanel.appendChild(ground);
+  // Array of draggable items
+  const draggableItems = [
+    { id: "ground", text: "ground" },
+    { id: "warehouse", text: "warehouse" },
+  ];
 
-  const warehouse = document.createElement("div");
-  warehouse.className = "draggable";
-  warehouse.id = "warehouse";
-  warehouse.setAttribute("draggable", true);
-  warehouse.textContent = "warehouse";
-  leftPanel.appendChild(warehouse);
+  // Loop through the array to create draggable items
+  draggableItems.forEach((item) => {
+    const draggableDiv = document.createElement("div");
+    draggableDiv.className = "draggable";
+    draggableDiv.id = item.id;
+    draggableDiv.setAttribute("draggable", true);
+    draggableDiv.textContent = item.text;
+    leftPanel.appendChild(draggableDiv);
+  });
+
+  const dropdownSheet = document.createElement("div");
+  dropdownSheet.id = "dropdownSheet";
+  dropdownSheet.style.display = "none";
 
   // create right panel
   const rightPanel = document.createElement("div");
@@ -57,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.body.appendChild(rightPanel);
   document.body.appendChild(exportButton);
   document.body.appendChild(importButton);
+  document.body.appendChild(dropdownSheet);
 
   //declarations
   const scene = new THREE.Scene();
@@ -191,18 +197,57 @@ document.addEventListener("DOMContentLoaded", function () {
   // Step 6: Add Objects to Scene
   function addObjectToScene(type) {
     let object;
+    const container = document.createElement("div");
+    container.id = "container";
+    
     switch (type) {
       case "ground":
-        object = addGround(100, 100);
+        const {container: width,inputElement: widthInput} = createInputField("width", 100);
+        const {container: depth,inputElement: depthInput} = createInputField("depth", 100);
+        container.appendChild(width);
+        container.appendChild(depth);
+        object = addGround(widthInput.value, depthInput.value);
+        scene.add(object);
+        widthInput.addEventListener("input", function (event) {
+          scene.remove(object);
+          object = addGround(event.target.value, depthInput.value);
+          scene.add(object);
+        });
+        depthInput.addEventListener("input", function (event) {
+          scene.remove(object);
+          object = addGround(widthInput.value, event.target.value);
+          scene.add(object);
+        });
         break;
       case "warehouse":
-        object = addWarehouse(5, 60, 30);
+        const {container: warehouseWidth,inputElement: warehouseWidthInput} = createInputField("warehouseWidth", 60);
+        const {container: warehouseDepth,inputElement: warehouseDepthInput} = createInputField("warehouseDepth", 30);
+        const {container: warehouseHeight,inputElement: warehouseHeightInput} = createInputField("warehouseHeight", 5);
+        container.appendChild(warehouseWidth);
+        container.appendChild(warehouseDepth);
+        container.appendChild(warehouseHeight);
+        object = addWarehouse(warehouseHeightInput.value, warehouseWidthInput.value, warehouseDepthInput.value);
+        scene.add(object);
+        warehouseWidthInput.addEventListener("input", function (event) {
+          scene.remove(object);
+          object = addWarehouse(warehouseHeightInput.value, event.target.value, warehouseDepthInput.value);
+          scene.add(object);
+        });
+        warehouseDepthInput.addEventListener("input", function (event) {
+          scene.remove(object);
+          object = addWarehouse(warehouseHeightInput.value, warehouseWidthInput.value, event.target.value);
+          scene.add(object);
+        });
+        warehouseHeightInput.addEventListener("input", function (event) {
+          scene.remove(object);
+          object = addWarehouse(event.target.value, warehouseWidthInput.value, warehouseDepthInput.value);
+          scene.add(object);
+        });
         break;
       default:
         return;
     }
-
-    scene.add(object);
+    document.getElementById(draggedObjectType).after(container);
 
     // Record the action for undo
     undoStack.push({
@@ -212,6 +257,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // clear redo stack when a new action is made
     redoStack = [];
+  }
+
+  function createInputField(label, defaultValue) {
+    const container = document.createElement("div");
+
+    const labelElement = document.createElement("label");
+    labelElement.textContent = label;
+
+    const inputElement = document.createElement("input");
+    inputElement.type = "number";
+    inputElement.value = defaultValue;
+
+    container.appendChild(labelElement);
+    container.appendChild(inputElement);
+
+    return {container, inputElement};
   }
 
   function addGround(
@@ -281,7 +342,7 @@ document.addEventListener("DOMContentLoaded", function () {
       roughness: 0.5,
     });
 
-    const warehouseWalls = new THREE.Group();
+    var warehouseWalls = new THREE.Group();
 
     // Front Wall
     const frontWallLeft = new THREE.Mesh(
@@ -353,7 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Left Wall
     const leftWall = new THREE.Mesh(
-      new THREE.BoxGeometry(thickness, wallHeight, warehouseDepth + thickness),
+      new THREE.BoxGeometry(thickness, wallHeight, warehouseDepth),
       wallMaterial
     );
     leftWall.position.set(-warehouseWidth / 2, wallHeight / 2, 0); // Position on left
@@ -361,14 +422,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Right Wall
     const rightWall = new THREE.Mesh(
-      new THREE.BoxGeometry(thickness, wallHeight, warehouseDepth + thickness),
+      new THREE.BoxGeometry(thickness, wallHeight, warehouseDepth),
       wallMaterial
     );
     rightWall.position.set(warehouseWidth / 2, wallHeight / 2, 0); // Position on right
     warehouseWalls.add(rightWall);
 
+    
     warehouseWalls.position.set(0, 0, 0);
-
     warehouseWalls = convertGroupToSingleMesh(warehouseWalls);
 
     return warehouseWalls;
@@ -401,8 +462,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Merge all geometries into a single geometry
-    mergedGeometry =
-      BufferGeometryUtils.mergeBufferGeometries(geometries);
+    mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries);
 
     // Create a new mesh from the merged geometry and the material
     const mergedMesh = new THREE.Mesh(mergedGeometry, mergedMaterial);
@@ -508,20 +568,20 @@ document.addEventListener("DOMContentLoaded", function () {
         localOriginMarker.visible = true; // Show local origin marker
 
         // Attach TransformControls to the selected object
-        transformControls.attach(selectedObject);
+        // transformControls.attach(selectedObject);
         // Disable OrbitControls when interacting with TransformControls
-        transformControls.addEventListener(
-          "dragging-changed",
-          function (event) {
-            controls.enabled = !event.value;
-          }
-        );
+        // transformControls.addEventListener(
+        //   "dragging-changed",
+        //   function (event) {
+        //     controls.enabled = !event.value;
+        //   }
+        // );
       } else {
         // If no object is selected, detach controls and hide the origin marker
-        transformControls.detach();
-        if (localOriginMarker) {
-          localOriginMarker.visible = false;
-        }
+        // transformControls.detach();
+        // if (localOriginMarker) {
+        //   localOriginMarker.visible = false;
+        // }
         selectedObject = null; // Reset selected object
       }
     }
