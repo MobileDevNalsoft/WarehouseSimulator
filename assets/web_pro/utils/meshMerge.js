@@ -1,3 +1,6 @@
+import * as THREE from "three";
+import * as BufferGeometryUtils from "bufferGeometryUtils";
+
 export function convertGroupToSingleMesh(group) {
     let mergedGeometry = new THREE.BufferGeometry(); // Placeholder for the merged geometry
     let mergedMaterial = null; // Will be used to store the material
@@ -25,7 +28,7 @@ export function convertGroupToSingleMesh(group) {
     });
 
     // Merge all geometries into a single geometry
-    mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries);
+    mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries);
 
     // Create a new mesh from the merged geometry and the material
     const mergedMesh = new THREE.Mesh(mergedGeometry, mergedMaterial);

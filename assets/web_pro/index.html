@@ -10,23 +10,27 @@
     {
       "imports": {
         "three": "./node_modules/three/build/three.module.js",
+        "orbitControls": "./node_modules/three/examples/jsm/controls/OrbitControls.js",
+        "bufferGeometryUtils": "./node_modules/three/examples/jsm/utils/BufferGeometryUtils.js",
         "renderer": "./utils/renderer.js",
         "initScene": "./utils/initScene.js",
         "interactions": "./utils/interactions.js",
-        
+        "addObject": "./utils/addObject.js",
+        "camera": "./utils/camera.js",
+        "controls": "./utils/controls.js",
+        "lights": "./utils/lights.js",
+        "meshMerge": "./utils/meshMerge.js",
+        "jsonLoader": "./utils/jsonLoader.js",
+        "start": "./builders/start.js",
+        "compound": "./builders/compound.js",
+        "plane": "./components/plane.js",
+        "walls": "./components/walls.js"
       }
     }
   </script>
   <body>
-    <div id="leftPanel">
-      <h3 id="heading">Components</h3>
-      <div id="ground" class="draggable" draggable="true">Ground</div>
-      <div id="walls" class="draggable" draggable="true">Walls</div>
-    </div>
     <div id="threeDView">
-      <canvas id="threeCanvas">
-        
-      </canvas>
+      <canvas id="threeCanvas"></canvas>
     </div>
     </script>
     <!-- <button id="uploadButton">Upload Texture</button>

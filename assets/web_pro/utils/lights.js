@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import type { Scene } from 'three';
 
-export function addLights(scene: Scene){
+export function addLights(scene){
   const ambientLight = new THREE.AmbientLight(0x404040); // Soft light
   scene.add(ambientLight);
 

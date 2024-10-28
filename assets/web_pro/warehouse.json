@@ -1,0 +1,11 @@
+{
+    "objects": [
+        {
+            "name": "compound",
+            "width": 100,
+            "depth": 100,
+            "wallThickness": 1,
+            "wallHeight": 10
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/Addons.js';
+import { OrbitControls } from 'orbitControls';
 
 export function addControls(camera, renderer){
     // Adding OrbitControls for mouse interaction

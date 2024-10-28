@@ -1,6 +1,5 @@
 import * as THREE from "three";
-import { TransformControls } from "three/examples/jsm/Addons.js";
-import { addObjectToScene } from "../components/addObject";
+import { addObjectToScene } from "addObject";
 
 export function addInteractions(scene, camera, renderer, gridHelper) {
   const raycaster = new THREE.Raycaster();
@@ -8,9 +7,6 @@ export function addInteractions(scene, camera, renderer, gridHelper) {
   // need mouse coordinates for raycasting.
   const mouse = new THREE.Vector2();
   const lastPos = new THREE.Vector2();
-
-  // Create a TransformControls instance
-  const transformControls = new TransformControls(camera, renderer.domElement);
 
   const draggableElements = document.querySelectorAll(".draggable");
   let draggedObjectType = null;
