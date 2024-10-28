@@ -2,13 +2,17 @@
 import * as THREE from "three";
 
 // Import loaders and controls from the same version on jsDelivr
-import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/controls/OrbitControls.js";
-import { GLTFExporter } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/exporters/GLTFExporter.js";
-import { TransformControls } from "https://cdn.jsdelivr.net/npm/three@0.154.0/examples/jsm/controls/TransformControls.js";
-import { BufferGeometryUtils } from "https://cdn.jsdelivr.net/npm/three@0.125.2/examples/jsm/utils/BufferGeometryUtils.js";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
+import { GLTFExporter } from "three/examples/jsm/Addons.js";
+import { TransformControls } from "three/examples/jsm/Addons.js";
+import { BufferGeometryUtils } from "three/examples/jsm/Addons.js";
 
 let undoStack = [];
 let redoStack = [];
+// Store the currently selected object
+let selectedObject = null;
+let selectedObjectOutline = null;
+let localOriginMarker = null;
 
 document.addEventListener("DOMContentLoaded", function () {
   //create left panel
@@ -85,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
     preserveDrawingBuffer: true,
   });
   renderer.setPixelRatio(Math.min(Math.max(1, window.devicePixelRatio), 2));
-  renderer.setSize(window.innerWidth * 0.8, window.innerHeight);
 
   // PMREM Generator for improved environment lighting
   const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -104,10 +107,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Create a TransformControls instance
   const transformControls = new TransformControls(camera, renderer.domElement);
   scene.add(transformControls);
-
-  // Store the currently selected object
-  let selectedObject = null;
-  let localOriginMarker = null;
 
   // Adding GridHelper (a grid for visualizing the ground plane)
   const gridHelper = new THREE.GridHelper(1000, 1000, 0x888888, 0x444444);
@@ -199,11 +198,17 @@ document.addEventListener("DOMContentLoaded", function () {
     let object;
     const container = document.createElement("div");
     container.id = "container";
-    
+
     switch (type) {
       case "ground":
-        const {container: width,inputElement: widthInput} = createInputField("width", 100);
-        const {container: depth,inputElement: depthInput} = createInputField("depth", 100);
+        const { container: width, inputElement: widthInput } = createInputField(
+          "width",
+          100
+        );
+        const { container: depth, inputElement: depthInput } = createInputField(
+          "depth",
+          100
+        );
         container.appendChild(width);
         container.appendChild(depth);
         object = addGround(widthInput.value, depthInput.value);
@@ -220,27 +225,48 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         break;
       case "warehouse":
-        const {container: warehouseWidth,inputElement: warehouseWidthInput} = createInputField("warehouseWidth", 60);
-        const {container: warehouseDepth,inputElement: warehouseDepthInput} = createInputField("warehouseDepth", 30);
-        const {container: warehouseHeight,inputElement: warehouseHeightInput} = createInputField("warehouseHeight", 5);
+        const { container: warehouseWidth, inputElement: warehouseWidthInput } =
+          createInputField("warehouseWidth", 60);
+        const { container: warehouseDepth, inputElement: warehouseDepthInput } =
+          createInputField("warehouseDepth", 30);
+        const {
+          container: warehouseHeight,
+          inputElement: warehouseHeightInput,
+        } = createInputField("warehouseHeight", 5);
         container.appendChild(warehouseWidth);
         container.appendChild(warehouseDepth);
         container.appendChild(warehouseHeight);
-        object = addWarehouse(warehouseHeightInput.value, warehouseWidthInput.value, warehouseDepthInput.value);
+        object = addWarehouse(
+          warehouseHeightInput.value,
+          warehouseWidthInput.value,
+          warehouseDepthInput.value
+        );
         scene.add(object);
         warehouseWidthInput.addEventListener("input", function (event) {
           scene.remove(object);
-          object = addWarehouse(warehouseHeightInput.value, event.target.value, warehouseDepthInput.value);
+          object = addWarehouse(
+            warehouseHeightInput.value,
+            event.target.value,
+            warehouseDepthInput.value
+          );
           scene.add(object);
         });
         warehouseDepthInput.addEventListener("input", function (event) {
           scene.remove(object);
-          object = addWarehouse(warehouseHeightInput.value, warehouseWidthInput.value, event.target.value);
+          object = addWarehouse(
+            warehouseHeightInput.value,
+            warehouseWidthInput.value,
+            event.target.value
+          );
           scene.add(object);
         });
         warehouseHeightInput.addEventListener("input", function (event) {
           scene.remove(object);
-          object = addWarehouse(event.target.value, warehouseWidthInput.value, warehouseDepthInput.value);
+          object = addWarehouse(
+            event.target.value,
+            warehouseWidthInput.value,
+            warehouseDepthInput.value
+          );
           scene.add(object);
         });
         break;
@@ -272,7 +298,7 @@ document.addEventListener("DOMContentLoaded", function () {
     container.appendChild(labelElement);
     container.appendChild(inputElement);
 
-    return {container, inputElement};
+    return { container, inputElement };
   }
 
   function addGround(
@@ -324,20 +350,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const warehouseDepth = depth; // Depth of the room
 
     // Load Texture
-    const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load(
-      "../images/warehouse_wall.jpg",
-      function () {
-        // Set texture repeat
-        texture.wrapS = THREE.RepeatWrapping; // Repeat horizontally
-        texture.wrapT = THREE.RepeatWrapping; // Repeat vertically
-        texture.repeat.set(10, 5); // Number of times to repeat in each direction
-      }
-    ); // Replace with your texture path
+    // const textureLoader = new THREE.TextureLoader();
+    // const texture = textureLoader.load(
+    //   "../images/warehouse_wall.jpg",
+    //   function () {
+    //     // Set texture repeat
+    //     texture.wrapS = THREE.RepeatWrapping; // Repeat horizontally
+    //     texture.wrapT = THREE.RepeatWrapping; // Repeat vertically
+    //     texture.repeat.set(10, 5); // Number of times to repeat in each direction
+    //   }
+    // ); // Replace with your texture path
 
     // Create Walls
     const wallMaterial = new THREE.MeshStandardMaterial({
-      map: texture,
+      // map: texture,
       metalness: 0.1,
       roughness: 0.5,
     });
@@ -428,9 +454,8 @@ document.addEventListener("DOMContentLoaded", function () {
     rightWall.position.set(warehouseWidth / 2, wallHeight / 2, 0); // Position on right
     warehouseWalls.add(rightWall);
 
-    
     warehouseWalls.position.set(0, 0, 0);
-    warehouseWalls = convertGroupToSingleMesh(warehouseWalls);
+    // warehouseWalls = convertGroupToSingleMesh(warehouseWalls);
 
     return warehouseWalls;
   }
@@ -533,6 +558,88 @@ document.addEventListener("DOMContentLoaded", function () {
     lastPos.y = -(e.clientY / window.innerHeight) * 2 + 1;
   }
 
+  // Function to create an outline for the object
+  function createOutline(object) {
+    // Use EdgesGeometry to create geometry for edges only
+    const edgesGeometry = new THREE.EdgesGeometry(object.geometry.clone());
+    const outline = new THREE.LineSegments(
+      edgesGeometry,
+      new THREE.LineBasicMaterial({
+        color: 0x00ff00, // Set to green for highlighting
+        linewidth: 2, // Line width (though this might not be visible in all renderers)
+      })
+    );
+    outline.position.copy(object.position);
+    outline.rotation.copy(object.rotation);
+    outline.scale.copy(object.scale);
+
+    // Manually update the matrix to ensure it matches perfectly
+    outline.matrixAutoUpdate = false; // Disable auto update
+    outline.updateMatrix(); // Apply the matrix updates
+    return outline;
+  }
+
+  // function onMouseUp(e) {
+  //   if ((lastPos.distanceTo(mouse) === 0) & (e.button === 0)) {
+  //     raycaster.setFromCamera(mouse, camera);
+  //     // This method sets up the raycaster to cast a ray from the camera into the 3D scene based on the current mouse position. It allows you to determine which objects in the scene are intersected by that ray.
+  //     const intersects = raycaster.intersectObjects(
+  //       scene.children.filter((object) => {
+  //         return object !== gridHelper && object != axesHelper;
+  //       }),
+  //       true
+  //     );
+  //     // we get the objects from the model as list that are intersected by the casted ray.
+
+  //     if (intersects.length > 0) {
+  //       // Get the first intersected object
+  //       const newSelectedObject = intersects[0].object;
+
+  //       // Deselect the previous object if it exists
+  //       if (selectedObject && selectedObjectOutline) {
+  //         selectedObject.remove(selectedObjectOutline);
+  //         scene.remove(localOriginMarker); // Remove previous local origin marker
+  //       }
+
+  //       // Update the selected object
+  //       selectedObject = newSelectedObject;
+
+  //       // Create and add the outline for the new selected object
+  //       selectedObjectOutline = createOutline(selectedObject);
+  //       selectedObject.add(selectedObjectOutline);
+
+  //       // Create and position the local origin marker
+  //       if (!localOriginMarker) {
+  //         localOriginMarker = createLocalOriginMarker();
+  //       }
+  //       localOriginMarker.position.copy(selectedObject.position);
+  //       localOriginMarker.visible = true; // Show local origin marker
+
+  //       // Attach TransformControls to the selected object
+  //       transformControls.attach(selectedObject);
+  //       // Disable OrbitControls when interacting with TransformControls
+  //       transformControls.addEventListener(
+  //         "dragging-changed",
+  //         function (event) {
+  //           controls.enabled = !event.value;
+  //         }
+  //       );
+  //     } else {
+  //       // If no object is selected, detach controls and hide the origin marker
+  //       transformControls.detach(selectedObject);
+  //       if (localOriginMarker) {
+  //         localOriginMarker.visible = false;
+  //       }
+  //       // Remove outline and deselect if nothing was clicked
+  //       if (selectedObjectOutline) {
+  //         selectedObject.remove(selectedObjectOutline);
+  //         selectedObjectOutline = null;
+  //       }
+  //       selectedObject = null;
+  //     }
+  //   }
+  // }
+
   function onMouseUp(e) {
     if ((lastPos.distanceTo(mouse) === 0) & (e.button === 0)) {
       raycaster.setFromCamera(mouse, camera);
@@ -550,15 +657,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const newSelectedObject = intersects[0].object;
 
         // Deselect the previous object if it exists
-        if (selectedObject) {
-          selectedObject.material.color.set(0x00ff00); // Reset color to original
+        if (selectedObject && selectedObjectOutline) {
+          selectedObject.remove(selectedObjectOutline);
           scene.remove(localOriginMarker); // Remove previous local origin marker
         }
 
         // Update the selected object
         selectedObject = newSelectedObject;
 
-        selectedObject.material.color.set(0xff00ff); // Change color to indicate selection
+        // Create and add the outline for the new selected object
+        selectedObjectOutline = createOutline(selectedObject);
+        selectedObject.add(selectedObjectOutline);
 
         // Create and position the local origin marker
         if (!localOriginMarker) {
@@ -568,24 +677,59 @@ document.addEventListener("DOMContentLoaded", function () {
         localOriginMarker.visible = true; // Show local origin marker
 
         // Attach TransformControls to the selected object
-        // transformControls.attach(selectedObject);
+        transformControls.attach(selectedObject);
         // Disable OrbitControls when interacting with TransformControls
-        // transformControls.addEventListener(
-        //   "dragging-changed",
-        //   function (event) {
-        //     controls.enabled = !event.value;
-        //   }
-        // );
+        transformControls.addEventListener(
+          "dragging-changed",
+          function (event) {
+            controls.enabled = !event.value;
+          }
+        );
       } else {
         // If no object is selected, detach controls and hide the origin marker
-        // transformControls.detach();
-        // if (localOriginMarker) {
-        //   localOriginMarker.visible = false;
-        // }
-        selectedObject = null; // Reset selected object
+        transformControls.detach(selectedObject);
+        if (localOriginMarker) {
+          localOriginMarker.visible = false;
+        }
+        // Remove outline and deselect if nothing was clicked
+        if (selectedObjectOutline) {
+          selectedObject.remove(selectedObjectOutline);
+          selectedObjectOutline = null;
+        }
+        selectedObject = null;
       }
     }
   }
+
+  // // Texture upload button and file input handling
+  // const uploadButton = document.getElementById('uploadButton');
+  // const fileInput = document.getElementById('textureUpload');
+
+  // // Button click to trigger the hidden file input
+  // uploadButton.addEventListener('click', () => {
+  //     fileInput.click();
+  // });
+
+  // // File input change event to load and apply the texture
+  // fileInput.addEventListener('change', (event) => {
+  //     const file = event.target.files[0];
+  //     if (file) {
+  //         const reader = new FileReader();
+  //         reader.onload = function (e) {
+  //             const textureLoader = new THREE.TextureLoader();
+  //             textureLoader.load(e.target.result, (texture) => {
+  //                 if (selectedObject) {
+  //                     if (selectedObject.material.map) {
+  //                         selectedObject.material.map.dispose(); // Free old texture
+  //                     }
+  //                     selectedObject.material.map = texture;
+  //                     selectedObject.material.needsUpdate = true;
+  //                 }
+  //             });
+  //         };
+  //         reader.readAsDataURL(file);
+  //     }
+  // });
 
   window.addEventListener("mousemove", onMouseMove); // triggered when mouse pointer is moved.
   window.addEventListener("mousedown", onMouseDown);

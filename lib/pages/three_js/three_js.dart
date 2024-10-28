@@ -78,7 +78,7 @@ class _ThreeJsWebViewState extends State<ThreeJsWebView> with TickerProviderStat
                 return SizedBox(
                   width: size.width*widthAnimation.value,
                   child: InAppWebView(
-                    initialFile: 'assets/web_code/index.html',
+                    initialFile: 'assets/web_pro/index.html',
                     onConsoleMessage: (controller, consoleMessage) {
                       // try {
                       //   if (consoleMessage.messageLevel.toNativeValue() == 1) {

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Warehouse Simulator</title>
+  </head>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./node_modules/three/build/three.module.js",
+        "renderer": "./utils/renderer.js",
+        "initScene": "./utils/initScene.js",
+        "interactions": "./utils/interactions.js",
+        
+      }
+    }
+  </script>
+  <body>
+    <div id="leftPanel">
+      <h3 id="heading">Components</h3>
+      <div id="ground" class="draggable" draggable="true">Ground</div>
+      <div id="walls" class="draggable" draggable="true">Walls</div>
+    </div>
+    <div id="threeDView">
+      <canvas id="threeCanvas">
+        
+      </canvas>
+    </div>
+    </script>
+    <!-- <button id="uploadButton">Upload Texture</button>
+    <input
+      type="file"
+      id="textureUpload"
+      accept="image/*"
+      style="display: none"
+    /> -->
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

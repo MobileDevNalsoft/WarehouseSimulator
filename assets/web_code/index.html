@@ -3,17 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style.css" />
     <title>Warehouse Simulator</title>
   </head>
   <body>
+    <div id="leftPanel">
+      <h3 id="heading">Components</h3>
+      <div id="ground" class="draggable">Ground</div>
+      <div id="walls" class="draggable">Walls</div>
+    </div>
+    <div id="threeDCanvas">
+
+    </div>
     <script type="importmap">
       {
         "imports": {
-          "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"
+          "three": "./node_modules/three/build/three.module.js"
         }
       }
     </script>
+    <!-- <button id="uploadButton">Upload Texture</button>
+    <input
+      type="file"
+      id="textureUpload"
+      accept="image/*"
+      style="display: none"
+    /> -->
     <script type="module" src="./model.js"></script>
   </body>
 </html>
