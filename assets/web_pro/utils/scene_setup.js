@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { addLights } from "lights";
-import { addControls } from "controls";
 
 export function initScene(renderer, camera) {
   const scene = new THREE.Scene();

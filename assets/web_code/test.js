@@ -612,3 +612,57 @@ function write3DText(text, callback) {
     }
   );
 }
+
+
+
+// {
+//   "objects": [
+//       {
+//           "name": "compound",
+//           "width": 130,
+//           "depth": 90,
+//           "wallThickness": 0.5,
+//           "wallHeight": 10
+//       },
+//       {
+//           "name": "warehouse_exterior",
+//           "width": 60,
+//           "depth": 30,
+//           "wallThickness": 0.5,
+//           "wallHeight": 6
+//       },
+//       {
+//           "name": "areas",
+//           "top_areas": [
+//               {
+//                   "name": "storage_area",
+//                   "width": 35,
+//                   "depth": 15,
+//                   "number_of_racks": 5
+//               },
+//               {
+//                   "name": "inspection_area",
+//                   "width": 25,
+//                   "depth": 15
+//               }
+//           ],
+//           "bottom_areas": [
+//               {
+//                   "name": "staging_area",
+//                   "width": 20,
+//                   "depth": 15
+//               },
+//               {
+//                   "name": "activity_area",
+//                   "width": 20,
+//                   "depth": 15
+//               },
+//               {
+//                   "name": "receiving_area",
+//                   "width": 20,
+//                   "depth": 15
+//               }
+//           ]
+//       }
+//   ]
+// }
